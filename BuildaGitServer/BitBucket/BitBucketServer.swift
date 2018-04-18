@@ -10,12 +10,12 @@ import Foundation
 import BuildaUtils
 
 class BitBucketServer: GitServer {
-    
+
     let endpoints: BitBucketEndpoints
     let cache = InMemoryURLCache()
-    
+
     init(endpoints: BitBucketEndpoints, http: HTTP? = nil) {
-        
+
         self.endpoints = endpoints
         super.init(service: .GitHub, http: http)
     }
@@ -27,20 +27,20 @@ extension BitBucketServer: SourceServerType {
         let key = "Buildasaur"
         return BitBucketStatus(state: bbState, key: key, name: key, description: description, url: targetUrl)
     }
-    
+
     func getBranchesOfRepo(repo: String, completion: @escaping (_ branches: [BranchType]?, _ error: Error?) -> Void) {
-        
+
         //TODO: start returning branches
         completion([], nil)
     }
 
     func getOpenPullRequests(repo: String, completion: @escaping ([PullRequestType]?, Error?) -> Void) {
-        
+
         let params = [
             "repo": repo
         ]
         self._sendRequestWithMethod(method: .get, endpoint: .pullRequests, params: params, query: nil, body: nil) { (_, body, error) -> Void in
-            
+
             if error != nil {
                 completion(nil, error)
                 return
@@ -63,7 +63,7 @@ extension BitBucketServer: SourceServerType {
             "repo": repo,
             "pr": pullRequestNumber.description
         ]
-        
+
         self._sendRequestWithMethod(method: .get, endpoint: .pullRequests, params: params, query: nil, body: nil) { (_, body, error) -> Void in
 
             if error != nil {
@@ -81,9 +81,9 @@ extension BitBucketServer: SourceServerType {
             }
         }
     }
-    
+
     func getRepo(repo: String, completion: @escaping (_ repo: RepoType?, _ error: Error?) -> Void) {
-        
+
         let params = [
             "repo": repo
         ]

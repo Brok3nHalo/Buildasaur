@@ -12,37 +12,36 @@ protocol BitBucketType {
     init(json: NSDictionary) throws
 }
 
-class BitBucketEntity : BitBucketType {
-    
+class BitBucketEntity: BitBucketType {
+
     required init(json: NSDictionary) throws {
-        
+
         //add any common keys to be parsed here
     }
-    
+
     init() {
-        
+
         //
     }
-    
+
     func dictionarify() -> NSDictionary {
         assertionFailure("Must be overriden by subclasses that wish to dictionarify their data")
         return NSDictionary()
     }
-    
+
     class func optional<T: BitBucketEntity>(json: NSDictionary?) throws -> T? {
         if let json = json {
             return try T(json: json)
         }
         return nil
     }
-    
+
 }
 
 //parse an array of dictionaries into an array of parsed entities
 func BitBucketArray<T>(jsonArray: [NSDictionary]) throws -> [T] where T: BitBucketType {
-    
-    let parsed = try jsonArray.map {
-        (json: NSDictionary) -> (T) in
+
+    let parsed = try jsonArray.map { (json: NSDictionary) -> (T) in
         return try T(json: json)
     }
     return parsed

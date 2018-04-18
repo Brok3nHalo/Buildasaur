@@ -9,13 +9,13 @@
 import Foundation
 
 class BitBucketIssue: BitBucketEntity, IssueType {
-    
+
     let number: Int
-    
+
     required init(json: NSDictionary) throws {
-        
+
         self.number = try json.intForKey("id")
-        
+
         try super.init(json: json)
     }
 }

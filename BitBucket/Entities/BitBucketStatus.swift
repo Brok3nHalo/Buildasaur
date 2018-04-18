@@ -9,61 +9,61 @@
 import Foundation
 
 class BitBucketStatus: BitBucketEntity, StatusType {
-    
+
     enum BitBucketState: String {
         case InProgress = "INPROGRESS"
         case Success = "SUCCESSFUL"
         case Failed = "FAILED"
     }
-    
+
     let bbState: BitBucketState
     let key: String
     let name: String?
     let description: String?
     let targetUrl: String?
-    
+
     required init(json: NSDictionary) throws {
-        
+
         self.bbState = BitBucketState(rawValue: try json.stringForKey("state"))!
         self.key = try json.stringForKey("key")
         self.name = json.optionalStringForKey("name")
         self.description = json.optionalStringForKey("description")
         self.targetUrl = try json.stringForKey("url")
-        
+
         try super.init(json: json)
     }
-    
+
     init(state: BitBucketState, key: String, name: String?, description: String?, url: [String: String]?) {
-        
+
         self.bbState = state
         self.key = key
         self.name = name
         self.description = description
         self.targetUrl = url?["https"]
-        
+
         super.init()
     }
-    
+
     var state: BuildState {
         return self.bbState.toBuildState()
     }
-    
+
     override func dictionarify() -> NSDictionary {
-        
+
         let dictionary = NSMutableDictionary()
-        
+
         dictionary["state"] = self.bbState.rawValue
         dictionary["key"] = self.key
         dictionary.optionallyAddValueForKey(self.description as AnyObject, key: "description")
         dictionary.optionallyAddValueForKey(self.name as AnyObject, key: "name")
         dictionary.optionallyAddValueForKey(self.targetUrl as AnyObject, key: "url")
-        
+
         return dictionary.copy() as! NSDictionary
     }
 }
 
 extension BitBucketStatus.BitBucketState {
-    
+
     static func fromBuildState(state: BuildState) -> BitBucketStatus.BitBucketState {
         switch state {
         case .Success, .NoState: return .Success
@@ -71,7 +71,7 @@ extension BitBucketStatus.BitBucketState {
         case .Error, .Failure: return .Failed
         }
     }
-    
+
     func toBuildState() -> BuildState {
         switch self {
         case .Success: return .Success

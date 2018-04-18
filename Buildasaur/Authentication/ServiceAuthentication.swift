@@ -54,7 +54,7 @@ class ServiceAuthenticator {
                     completion(nil, nil)
                     return
                 }
-                                
+
                 let auth = ProjectAuthenticator(service: service, username: "GIT", type: .OAuthToken, secret: secret)
                 completion(auth, nil)
             },

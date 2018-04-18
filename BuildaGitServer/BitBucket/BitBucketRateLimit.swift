@@ -9,6 +9,6 @@
 import Foundation
 
 struct BitBucketRateLimit: RateLimitType {
-    
+
     var report: String = "NO INFO"
 }
