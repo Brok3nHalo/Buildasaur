@@ -79,6 +79,7 @@ class ProjectViewController: ConfigEditViewController {
                 self.userWantsTokenAuth = newUserWantsTokenAuth
             }
             self.updateServiceMeta()
+            self.updateNextAllowed()
         }
     }
     private var userWantsTokenAuth: Bool = false {
@@ -176,6 +177,8 @@ class ProjectViewController: ConfigEditViewController {
             } else {
                 self.tokenTextField.stringValue = ""
             }
+        case .BitBucket:
+            self.useTokenButton.isHidden = true
         }
     }
 

@@ -25,7 +25,7 @@ class ServiceAuthenticator {
         case State
     }
 
-    typealias SecretFromResponseParams = ([String: String]) -> String
+    typealias SecretFromResponseParams = ([String: Any]) -> String?
 
     init() {}
 
@@ -50,7 +50,11 @@ class ServiceAuthenticator {
                               state: params[.State]!,
                               success: { _, _, parameters in
 
-                let secret = secretFromResponseParams(parameters as! [String : String])
+                guard let secret = secretFromResponseParams(parameters) else {
+                    completion(nil, nil)
+                    return
+                }
+                                
                 let auth = ProjectAuthenticator(service: service, username: "GIT", type: .OAuthToken, secret: secret)
                 completion(auth, nil)
             },
@@ -68,6 +72,8 @@ class ServiceAuthenticator {
         switch service {
         case .GitHub:
             return self.getGitHubParameters()
+        case .BitBucket:
+            return self.getBitBucketParameters()
         }
     }
 
@@ -85,8 +91,32 @@ class ServiceAuthenticator {
         ]
         let secret: SecretFromResponseParams = {
             //just pull out the access token, that's all we need
-            return $0["access_token"]!
+            return $0["access_token"] as? String
         }
         return (params, secret)
     }
+
+    private func getBitBucketParameters() -> ([ParamKey: String], SecretFromResponseParams) {
+        let service = GitService.BitBucket
+        let params: [ParamKey: String] = [
+            .ConsumerId: service.serviceKey(),
+            .ConsumerSecret: service.serviceSecret(),
+            .AuthorizeUrl: service.authorizeUrl(),
+            .AccessTokenUrl: service.accessTokenUrl(),
+            .ResponseType: "code",
+            .CallbackUrl: "buildasaur://oauth-callback/bitbucket",
+            .Scope: "pullrequest",
+            .State: generateState(withLength: 20) as String
+        ]
+        let secret: SecretFromResponseParams = {
+            //we need both the access and refresh tokens, because
+            //the refresh token only lives for one hour.
+            //but we'll only store the
+            let refreshToken = $0["refresh_token"]!
+            let accessToken = $0["access_token"]!
+            return "\(refreshToken):\(accessToken)"
+        }
+        return (params, secret)
+    }
+
 }

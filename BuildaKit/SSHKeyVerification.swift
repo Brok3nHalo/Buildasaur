@@ -33,7 +33,7 @@ public class SSHKeyVerification {
 
             let scriptString = String(data: data, encoding: String.Encoding.utf8)!
 
-            let xcodePath = self.findXcodeDeveloperFolder()
+            let xcodePath = self.findXcodeDeveloperFolder().replacingOccurrences(of: " ", with: "\\ ")
             let xcsbridgePath = "\(xcodePath)/usr/bin/xcsbridge"
             let xcsbridgeArgs = "source-control blueprint-preflight --path - --format json"
             let script = "echo '\(scriptString)' | \(xcsbridgePath) \(xcsbridgeArgs)"

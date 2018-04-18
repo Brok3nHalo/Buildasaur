@@ -82,6 +82,8 @@ extension WorkspaceMetadata {
 
         if projectURLString.contains(GitService.GitHub.hostname()) {
             gitService = .GitHub
+        } else if projectURLString.contains(GitService.BitBucket.hostname()) {
+            gitService = .BitBucket
         } else {
             Log.error("This git service is not yet supported.")
         }

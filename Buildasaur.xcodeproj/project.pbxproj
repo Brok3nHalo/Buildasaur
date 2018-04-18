@@ -114,6 +114,16 @@
 		775501D89C0E4D209E6EE5D0 /* Pods_BuildaGitServer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B9139F7877761955F17C535E /* Pods_BuildaGitServer.framework */; };
 		785688011CDD4843009EEB72 /* WorkspaceMetadataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 785688001CDD4843009EEB72 /* WorkspaceMetadataTests.swift */; };
 		D59A4C6EEE903468E69AEA81 /* Pods_BuildaKitTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4EC43508E8A4F9D6E5ED0126 /* Pods_BuildaKitTests.framework */; };
+		DC0504062085229A005FA055 /* BitBucketPullRequestBranch.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0503FC20852299005FA055 /* BitBucketPullRequestBranch.swift */; };
+		DC0504072085229A005FA055 /* BitBucketComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0503FD2085229A005FA055 /* BitBucketComment.swift */; };
+		DC0504082085229A005FA055 /* BitBucketEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0503FE2085229A005FA055 /* BitBucketEntity.swift */; };
+		DC0504092085229A005FA055 /* BitBucketIssue.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0503FF2085229A005FA055 /* BitBucketIssue.swift */; };
+		DC05040A2085229A005FA055 /* BitBucketStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0504002085229A005FA055 /* BitBucketStatus.swift */; };
+		DC05040B2085229A005FA055 /* BitBucketEndpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0504012085229A005FA055 /* BitBucketEndpoints.swift */; };
+		DC05040C2085229A005FA055 /* BitBucketRateLimit.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0504022085229A005FA055 /* BitBucketRateLimit.swift */; };
+		DC05040D2085229A005FA055 /* BitBucketPullRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0504032085229A005FA055 /* BitBucketPullRequest.swift */; };
+		DC05040E2085229A005FA055 /* BitBucketRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0504042085229A005FA055 /* BitBucketRepo.swift */; };
+		DC05040F2085229A005FA055 /* BitBucketServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0504052085229A005FA055 /* BitBucketServer.swift */; };
 		E41183531FC31D9500C112F6 /* TriggerConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = E41183521FC31D9500C112F6 /* TriggerConfig.swift */; };
 		E45CCF0E1FC60F45009F01B7 /* SlackNotifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = E400D0B71FC4359100EE329B /* SlackNotifier.swift */; };
 		E46BFA951FBF79EA00F1FF72 /* ServiceAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46BFA941FBF79EA00F1FF72 /* ServiceAuthentication.swift */; };
@@ -337,6 +347,16 @@
 		B9139F7877761955F17C535E /* Pods_BuildaGitServer.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BuildaGitServer.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D0F6A06E560D8D41488E34CB /* Pods-BuildaKitTests.testing.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BuildaKitTests.testing.xcconfig"; path = "Pods/Target Support Files/Pods-BuildaKitTests/Pods-BuildaKitTests.testing.xcconfig"; sourceTree = "<group>"; };
 		DBBDB133AF2AD2E2CA9AEB13 /* Pods-BuildaKitTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BuildaKitTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-BuildaKitTests/Pods-BuildaKitTests.debug.xcconfig"; sourceTree = "<group>"; };
+		DC0503FC20852299005FA055 /* BitBucketPullRequestBranch.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BitBucketPullRequestBranch.swift; path = BitBucket/Entities/BitBucketPullRequestBranch.swift; sourceTree = SOURCE_ROOT; };
+		DC0503FD2085229A005FA055 /* BitBucketComment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BitBucketComment.swift; path = BitBucket/Entities/BitBucketComment.swift; sourceTree = SOURCE_ROOT; };
+		DC0503FE2085229A005FA055 /* BitBucketEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BitBucketEntity.swift; path = BitBucket/Entities/BitBucketEntity.swift; sourceTree = SOURCE_ROOT; };
+		DC0503FF2085229A005FA055 /* BitBucketIssue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BitBucketIssue.swift; path = BitBucket/Entities/BitBucketIssue.swift; sourceTree = SOURCE_ROOT; };
+		DC0504002085229A005FA055 /* BitBucketStatus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BitBucketStatus.swift; path = BitBucket/Entities/BitBucketStatus.swift; sourceTree = SOURCE_ROOT; };
+		DC0504012085229A005FA055 /* BitBucketEndpoints.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BitBucketEndpoints.swift; path = BuildaGitServer/BitBucket/BitBucketEndpoints.swift; sourceTree = SOURCE_ROOT; };
+		DC0504022085229A005FA055 /* BitBucketRateLimit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BitBucketRateLimit.swift; path = BuildaGitServer/BitBucket/BitBucketRateLimit.swift; sourceTree = SOURCE_ROOT; };
+		DC0504032085229A005FA055 /* BitBucketPullRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BitBucketPullRequest.swift; path = BitBucket/Entities/BitBucketPullRequest.swift; sourceTree = SOURCE_ROOT; };
+		DC0504042085229A005FA055 /* BitBucketRepo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BitBucketRepo.swift; path = BitBucket/Entities/BitBucketRepo.swift; sourceTree = SOURCE_ROOT; };
+		DC0504052085229A005FA055 /* BitBucketServer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BitBucketServer.swift; path = BuildaGitServer/BitBucket/BitBucketServer.swift; sourceTree = SOURCE_ROOT; };
 		DC5ECE2BBCC7B037A35A3BE9 /* Pods-BuildaHeartbeatKit.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BuildaHeartbeatKit.debug.xcconfig"; path = "Pods/Target Support Files/Pods-BuildaHeartbeatKit/Pods-BuildaHeartbeatKit.debug.xcconfig"; sourceTree = "<group>"; };
 		E400D0B71FC4359100EE329B /* SlackNotifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlackNotifier.swift; sourceTree = "<group>"; };
 		E41183521FC31D9500C112F6 /* TriggerConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TriggerConfig.swift; sourceTree = "<group>"; };
@@ -611,6 +631,7 @@
 				3AAF6F031A3CE66A00C657FB /* GitServerPublic.swift */,
 				3A35CD6B1BE96E880088D57A /* Base */,
 				3A6355DB1A3BBDB000545BF9 /* GitHub */,
+				DC0503FB20852257005FA055 /* BitBucket */,
 				E45CCF0C1FC60E4D009F01B7 /* Slack */,
 				3AAF6EE61A3CE5BA00C657FB /* Supporting Files */,
 				3A0BE6E11C5A753F00AC9C57 /* Utils */,
@@ -759,6 +780,32 @@
 			);
 			name = Pods;
 			sourceTree = "<group>";
+		};
+		DC0503FB20852257005FA055 /* BitBucket */ = {
+			isa = PBXGroup;
+			children = (
+				DC050410208522BB005FA055 /* Entities */,
+				DC0504012085229A005FA055 /* BitBucketEndpoints.swift */,
+				DC0504052085229A005FA055 /* BitBucketServer.swift */,
+				DC0504022085229A005FA055 /* BitBucketRateLimit.swift */,
+			);
+			path = BitBucket;
+			sourceTree = SOURCE_ROOT;
+		};
+		DC050410208522BB005FA055 /* Entities */ = {
+			isa = PBXGroup;
+			children = (
+				DC0503FD2085229A005FA055 /* BitBucketComment.swift */,
+				DC0503FE2085229A005FA055 /* BitBucketEntity.swift */,
+				DC0503FF2085229A005FA055 /* BitBucketIssue.swift */,
+				DC0504032085229A005FA055 /* BitBucketPullRequest.swift */,
+				DC0503FC20852299005FA055 /* BitBucketPullRequestBranch.swift */,
+				DC0504042085229A005FA055 /* BitBucketRepo.swift */,
+				DC0504002085229A005FA055 /* BitBucketStatus.swift */,
+			);
+			name = Entities;
+			path = BitBucket/Entities;
+			sourceTree = SOURCE_ROOT;
 		};
 		E45CCF0C1FC60E4D009F01B7 /* Slack */ = {
 			isa = PBXGroup;
@@ -1050,7 +1097,7 @@
 				TargetAttributes = {
 					3A56876F1A3B93BD0066DB2B = {
 						CreatedOnToolsVersion = 6.1.1;
-						DevelopmentTeam = 2UH3E86XLG;
+						DevelopmentTeam = N6DC7ZM2RM;
 						LastSwiftMigration = 0830;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
@@ -1621,22 +1668,32 @@
 				3A32CD181A3D01E300861A34 /* GitHubIssue.swift in Sources */,
 				3AB3F0E11A3CEBAC005F717F /* GitHubCommit.swift in Sources */,
 				3A7AF6161C5923A4000FD726 /* GitServerFactory.swift in Sources */,
+				DC05040D2085229A005FA055 /* BitBucketPullRequest.swift in Sources */,
 				3A0BE6E31C5A754E00AC9C57 /* Extensions.swift in Sources */,
 				3AB3F0E31A3CEBAC005F717F /* GitHubPullRequest.swift in Sources */,
+				DC05040B2085229A005FA055 /* BitBucketEndpoints.swift in Sources */,
+				DC05040F2085229A005FA055 /* BitBucketServer.swift in Sources */,
 				3AB3F0E71A3CEBAC005F717F /* GitHubStatus.swift in Sources */,
 				3AB3F0E51A3CEBAC005F717F /* GitHubRepo.swift in Sources */,
+				DC05040A2085229A005FA055 /* BitBucketStatus.swift in Sources */,
 				E45CCF0E1FC60F45009F01B7 /* SlackNotifier.swift in Sources */,
 				3AB3F0E01A3CEBAC005F717F /* GitHubBranch.swift in Sources */,
+				DC0504062085229A005FA055 /* BitBucketPullRequestBranch.swift in Sources */,
 				3AB3F0EB1A3CEBE9005F717F /* GitServerPublic.swift in Sources */,
 				3AB3F0E81A3CEBAC005F717F /* GitHubEndpoints.swift in Sources */,
+				DC0504092085229A005FA055 /* BitBucketIssue.swift in Sources */,
 				3A32CD141A3D00F800861A34 /* GitHubComment.swift in Sources */,
 				3A35CD6E1BE96E9B0088D57A /* BaseTypes.swift in Sources */,
 				3AB3F0EA1A3CEBAC005F717F /* GitHubServer.swift in Sources */,
 				3AB3F0E41A3CEBAC005F717F /* GitHubPullRequestBranch.swift in Sources */,
+				DC0504082085229A005FA055 /* BitBucketEntity.swift in Sources */,
 				3AB3F0E61A3CEBAC005F717F /* GitHubUser.swift in Sources */,
+				DC05040E2085229A005FA055 /* BitBucketRepo.swift in Sources */,
 				3A35CD6F1BE96E9B0088D57A /* SourceServerExtensions.swift in Sources */,
 				3A3BDC1F1AF6D34900D2CD99 /* GitHubRateLimit.swift in Sources */,
 				3A014BA51C57A94B00B82B4A /* Authentication.swift in Sources */,
+				DC05040C2085229A005FA055 /* BitBucketRateLimit.swift in Sources */,
+				DC0504072085229A005FA055 /* BitBucketComment.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1807,7 +1864,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = 2UH3E86XLG;
+				DEVELOPMENT_TEAM = N6DC7ZM2RM;
 				INFOPLIST_FILE = Buildasaur/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
@@ -1828,7 +1885,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = 2UH3E86XLG;
+				DEVELOPMENT_TEAM = N6DC7ZM2RM;
 				ENABLE_NS_ASSERTIONS = YES;
 				INFOPLIST_FILE = Buildasaur/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
@@ -1990,7 +2047,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = 2UH3E86XLG;
+				DEVELOPMENT_TEAM = N6DC7ZM2RM;
 				ENABLE_NS_ASSERTIONS = YES;
 				ENABLE_TESTABILITY = YES;
 				INFOPLIST_FILE = Buildasaur/Info.plist;
