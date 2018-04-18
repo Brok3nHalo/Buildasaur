@@ -789,7 +789,8 @@
 				DC0504052085229A005FA055 /* BitBucketServer.swift */,
 				DC0504022085229A005FA055 /* BitBucketRateLimit.swift */,
 			);
-			path = BitBucket;
+			name = BitBucket;
+			path = BuildaGitServer/BitBucket;
 			sourceTree = SOURCE_ROOT;
 		};
 		DC050410208522BB005FA055 /* Entities */ = {
@@ -804,7 +805,6 @@
 				DC0504002085229A005FA055 /* BitBucketStatus.swift */,
 			);
 			name = Entities;
-			path = BitBucket/Entities;
 			sourceTree = SOURCE_ROOT;
 		};
 		E45CCF0C1FC60E4D009F01B7 /* Slack */ = {
