@@ -49,7 +49,6 @@ extension StandardSyncer {
                         return
                     }
 
-                    completion(nil)
                 }
 
                 if let comment = newStatus.comment {
@@ -78,6 +77,8 @@ extension StandardSyncer {
                             }
                         })
                     }
+                } else {
+                    completion(nil)
                 }
             } else {
                 completion(nil)
