@@ -1,31 +1,28 @@
 //
-//  BitBucketServer.swift
+//  BitBucketEnterpriseServer.swift
 //  Buildasaur
 //
 //  Created by Honza Dvorsky on 1/27/16.
 //  Copyright © 2016 Honza Dvorsky. All rights reserved.
 //
-
 import Foundation
 import BuildaUtils
+class BitBucketEnterpriseServer: GitServer<BitBucketEnterpriseService> {
 
-class BitBucketServer: GitServer<BitBucketService> {
-
-    let endpoints: BitBucketEndpoints
+    let endpoints: BitBucketEnterpriseEndpoints
     let cache = InMemoryURLCache()
 
-    init(endpoints: BitBucketEndpoints, http: HTTP? = nil) {
+    init(endpoints: BitBucketEnterpriseEndpoints, service: BitBucketEnterpriseService, http: HTTP? = nil) {
 
         self.endpoints = endpoints
-        super.init(service: BitBucketService(), http: http)
+        super.init(service: service, http: http)
     }
 }
-
-extension BitBucketServer: SourceServerType {
+extension BitBucketEnterpriseServer: SourceServerType {
     func createStatusFromState(state: BuildState, description: String?, targetUrl: [String: String]?) -> StatusType {
-        let bbState = BitBucketStatus.BitBucketState.fromBuildState(state: state)
+        let bbState = BitBucketEnterpriseStatus.BitBucketEnterpriseState.fromBuildState(state: state)
         let key = "Buildasaur"
-        return BitBucketStatus(state: bbState, key: key, name: key, description: description, url: targetUrl)
+        return BitBucketEnterpriseStatus(state: bbState, key: key, name: key, description: description, url: targetUrl)
     }
 
     func getBranchesOfRepo(repo: String, completion: @escaping (_ branches: [BranchType]?, _ error: Error?) -> Void) {
@@ -34,12 +31,12 @@ extension BitBucketServer: SourceServerType {
         completion([], nil)
     }
 
-    func getOpenPullRequests(repo: String, completion: @escaping ([PullRequestType]?, Error?) -> Void) {
+    func getOpenPullRequests(repo: String, completion: @escaping (_ prs: [PullRequestType]?, _ error: Error?) -> Void) {
 
         let params = [
             "repo": repo
         ]
-        self._sendRequestWithMethod(method: .get, endpoint: .pullRequests, params: params, query: nil, body: nil) { (_, body, error) -> Void in
+        self._sendRequestWithMethod(method: .get, endpoint: .PullRequests, params: params, query: nil, body: nil) { (_ response, body, error) -> Void in
 
             if error != nil {
                 completion(nil, error)
@@ -47,10 +44,13 @@ extension BitBucketServer: SourceServerType {
             }
 
             if let body = body as? [NSDictionary] {
-                let (result, error): ([BitBucketPullRequest]?, NSError?) = unthrow {
-                    return try BitBucketArray(jsonArray: body)
+                let (prs, error): ([BitBucketEnterprisePullRequest]?, NSError? ) = unthrow {
+                    return try BitBucketEnterpriseArray(jsonArray: body)
                 }
-                completion(result?.map { $0 as PullRequestType }, error)
+                prs?.forEach { (pr) in
+                    pr.repoName = repo
+                }
+                completion(prs?.map { $0 as PullRequestType }, error)
             } else {
                 completion(nil, GithubServerError.with("Wrong body \(String(describing: body))"))
             }
@@ -64,7 +64,7 @@ extension BitBucketServer: SourceServerType {
             "pr": pullRequestNumber.description
         ]
 
-        self._sendRequestWithMethod(method: .get, endpoint: .pullRequests, params: params, query: nil, body: nil) { (_, body, error) -> Void in
+        self._sendRequestWithMethod(method: .get, endpoint: .PullRequests, params: params, query: nil, body: nil) { (_ response, body, error) -> Void in
 
             if error != nil {
                 completion(nil, error)
@@ -72,10 +72,12 @@ extension BitBucketServer: SourceServerType {
             }
 
             if let body = body as? NSDictionary {
-                let (result, error): (BitBucketPullRequest?, NSError?) = unthrow {
-                    return try BitBucketPullRequest(json: body)
+                let (pr, error): (BitBucketEnterprisePullRequest?, NSError? ) = unthrow {
+                    return try BitBucketEnterprisePullRequest(json: body)
                 }
-                completion(result, error)
+
+                pr?.repoName = repo
+                completion(pr, error)
             } else {
                 completion(nil, GithubServerError.with("Wrong body \(String(describing: body))"))
             }
@@ -83,12 +85,12 @@ extension BitBucketServer: SourceServerType {
     }
 
     func getRepo(repo: String, completion: @escaping (_ repo: RepoType?, _ error: Error?) -> Void) {
-
+        let repo = service.repoName()
         let params = [
             "repo": repo
         ]
 
-        self._sendRequestWithMethod(method: .get, endpoint: .repos, params: params, query: nil, body: nil) { (_, body, error) -> Void in
+        self._sendRequestWithMethod(method: .get, endpoint: .Repos, params: params, query: nil, body: nil) { (_ response, body, error) -> Void in
 
             if error != nil {
                 completion(nil, error)
@@ -96,10 +98,11 @@ extension BitBucketServer: SourceServerType {
             }
 
             if let body = body as? NSDictionary {
-                let (result, error): (BitBucketRepo?, NSError?) = unthrow {
-                    return try BitBucketRepo(json: body)
+                let (repository, error): (BitBucketEnterpriseRepo?, NSError?) = unthrow {
+                    return try BitBucketEnterpriseRepo(json: body)
                 }
-                completion(result, error)
+
+                completion(repository, error)
             } else {
                 completion(nil, GithubServerError.with("Wrong body \(String(describing: body))"))
             }
@@ -110,11 +113,10 @@ extension BitBucketServer: SourceServerType {
 
         let params = [
             "repo": repo,
-            "sha": commit,
-            "status_key": "Buildasaur"
-        ]
+            "sha": commit
+            ]
 
-        self._sendRequestWithMethod(method: .get, endpoint: .commitStatuses, params: params, query: nil, body: nil) { (response, body, error) -> Void in
+        self._sendRequestWithMethod(method: .get, endpoint: .CommitStatuses, params: params, query: nil, body: nil) { (response, body, error) -> Void in
 
             if response?.statusCode == 404 {
                 //no status yet, just pass nil but OK
@@ -127,14 +129,25 @@ extension BitBucketServer: SourceServerType {
                 return
             }
 
-            if let body = body as? NSDictionary {
-                let (result, error): (BitBucketStatus?, NSError?) = unthrow {
-                    return try BitBucketStatus(json: body)
+            if let body = body as? NSArray {
+                Log.verbose("--------------- getStatusOfCommit: \(body)")
+                //TODO: make this use a Array instaed of NSArray so can use isEmpty
+                if body.count >= 1 {
+                    if let body = body[0] as? NSDictionary {
+                        let (status, error): (BitBucketEnterpriseStatus?, NSError?) = unthrow {
+                            return try BitBucketEnterpriseStatus(json: body)
+                        }
+
+                        completion(status, error)
+                        return
+                    }
                 }
-                completion(result, error)
-            } else {
-                completion(nil, GithubServerError.with("Wrong body \(String(describing: body))"))
+                // No Status
+                completion(nil, nil)
+                return
             }
+            completion(nil, GithubServerError.with("Wrong body \(String(describing: body))"))
+
         }
     }
 
@@ -145,21 +158,14 @@ extension BitBucketServer: SourceServerType {
             "sha": commit
         ]
 
-        let body = (status as! BitBucketStatus).dictionarify()
-        self._sendRequestWithMethod(method: .post, endpoint: .commitStatuses, params: params, query: nil, body: body) { (_, body, error) -> Void in
-
-            if error != nil {
-                completion(nil, error)
-                return
-            }
-
-            if let body = body as? NSDictionary {
-                let (result, error): (BitBucketStatus?, NSError?) = unthrow {
-                    return try BitBucketStatus(json: body)
-                }
-                completion(result, error)
+        let body = (status as! BitBucketEnterpriseStatus).dictionarify()
+        self._sendRequestWithMethod(method: .post, endpoint: .CommitStatuses, params: params, query: nil, body: body) { (response, _ body, _ error) -> Void in
+            let isSuccessful = response != nil && 200...299 ~= response!.statusCode
+            // status is always nil because the server doesn't return it at all
+            if isSuccessful {
+                completion(nil, nil)
             } else {
-                completion(nil, GithubServerError.with("Wrong body \(String(describing: body))"))
+                completion(nil, GithubServerError.with("Status code is not 2xx, failed to store status of commit"))
             }
         }
     }
@@ -172,21 +178,23 @@ extension BitBucketServer: SourceServerType {
         ]
 
         let body = [
-            "content": comment
+            "text": comment
         ]
 
-        self._sendRequestWithMethod(method: .post, endpoint: .pullRequestComments, params: params, query: nil, body: body as NSDictionary) { (_, body, error) -> Void in
+        self._sendRequestWithMethod(method: .post, endpoint: .PullRequestComments, params: params, query: nil, body: body as NSDictionary) { (_ response, body, error) -> Void in
 
             if error != nil {
+                Log.verbose("Failed to post comment with error: \(String(describing: error?.localizedDescription))")
                 completion(nil, error)
                 return
             }
 
             if let body = body as? NSDictionary {
-                let (result, error): (BitBucketComment?, NSError?) = unthrow {
-                    return try BitBucketComment(json: body)
+                let (comment, error): (BitBucketEnterpriseComment?, NSError?) = unthrow {
+                    return try BitBucketEnterpriseComment(json: body)
                 }
-                completion(result, error)
+
+                completion(comment, error)
             } else {
                 completion(nil, GithubServerError.with("Wrong body \(String(describing: body))"))
             }
@@ -200,7 +208,7 @@ extension BitBucketServer: SourceServerType {
             "pr": issueNumber.description
         ]
 
-        self._sendRequestWithMethod(method: .get, endpoint: .pullRequestComments, params: params, query: nil, body: nil) { (_, body, error) -> Void in
+        self._sendRequestWithMethod(method: .get, endpoint: .PullRequestComments, params: params, query: nil, body: nil) { (_ response, body, error) -> Void in
 
             if error != nil {
                 completion(nil, error)
@@ -208,28 +216,49 @@ extension BitBucketServer: SourceServerType {
             }
 
             if let body = body as? [NSDictionary] {
-                let (result, error): ([BitBucketComment]?, NSError?) = unthrow {
-                    return try BitBucketArray(jsonArray: body)
+                let (comments, error): ([BitBucketEnterpriseComment]?, NSError?) = unthrow {
+                    return try BitBucketEnterpriseArray(jsonArray: body)
                 }
-                completion(result?.map { $0 as CommentType }, error)
+
+                completion(comments?.map { $0 as CommentType }, error)
             } else {
                 completion(nil, GithubServerError.with("Wrong body \(String(describing: body))"))
             }
         }
     }
+    func approvePR(pr number: Int, repo name: String, completion: @escaping ((NSError?) -> Void)) {
+        let params = [
+            "repo": name,
+            "pr": number.description
+        ]
+        _sendRequestWithMethod(method: .post, endpoint: .ApprovePR, params: params, query: nil, body: nil) { (_ response, _ body, error) in
+            completion(error as NSError?)
+        }
+    }
+    func unApprovePR(pr number: Int, repo name: String, completion: @escaping ((NSError?) -> Void)) {
+        let params = [
+            "repo": name,
+            "pr": number.description
+        ]
+        _sendRequestWithMethod(method: .delete, endpoint: .ApprovePR, params: params, query: nil, body: nil) { (_ response, _ body, error) in
+            completion(error as NSError?)
+        }
+    }
 }
-
-extension BitBucketServer: Notifier {
+extension BitBucketEnterpriseServer: Notifier {
     func postCommentOnIssue(notification: NotifierNotification, completion: @escaping (_ comment: CommentType?, _ error: Error?) -> Void) {
         self._postCommentOnIssue(comment: notification.comment, issueNumber: notification.issueNumber!, repo: notification.repo) { (comment, error) -> Void in
             completion(comment, error)
         }
     }
 }
-
-extension BitBucketServer {
+extension BitBucketEnterpriseServer {
 
     private func _sendRequest(request: NSMutableURLRequest, isRetry: Bool = false, completion: @escaping HTTP.Completion) {
+        let cachedInfo = self.cache.getCachedInfoForRequest(request as URLRequest)
+        if let etag = cachedInfo.etag {
+            request.setValue(etag, forHTTPHeaderField: "If-None-Match")
+        }
 
         _ = self.http.sendRequest(request as URLRequest) { (response, body, error) -> Void in
 
@@ -237,91 +266,29 @@ extension BitBucketServer {
                 completion(response, body, error)
                 return
             }
-
             //error out on special HTTP status codes
             let statusCode = response!.statusCode
             switch statusCode {
-            case 401: //unauthorized, use refresh token to get a new access token
-                      //only try to refresh token once
-                if !isRetry {
-                    self._handle401(request: request, completion: completion)
-                }
+            case 200...299: //good response, cache the returned data
+                let responseInfo = ResponseInfo(response: response!, body: body as AnyObject)
+                cachedInfo.update(responseInfo)
+            case 304: //not modified, return the cached response
+                let responseInfo = cachedInfo.responseInfo!
+                completion(responseInfo.response, responseInfo.body, nil)
                 return
-            case 400, 402 ... 500:
-
-                let message = ((body as? NSDictionary)?["error"] as? NSDictionary)?["message"] as? String ?? (body as? String ?? "Unknown error")
+            case 400 ... 500:
+                let message = (((body as? NSDictionary)?["errors"] as? NSArray)?[0] as? NSDictionary)?["message"] as? String ?? (body as? String ?? "Unknown error")
                 let resultString = "\(statusCode): \(message)"
                 completion(response, body, GithubServerError.with(resultString/*, internalError: error*/))
                 return
             default:
                 break
             }
-
             completion(response, body, error)
         }
     }
 
-    private func _handle401(request: NSMutableURLRequest, completion: @escaping HTTP.Completion) {
-
-        //we need to use the refresh token to request a new access token
-        //then we need to notify that we updated the secret, so that it can
-        //be saved by buildasaur
-        //then we need to set the new access token to this waiting request and
-        //run it again. if that fails too, we fail for real.
-
-        Log.verbose("Got 401, starting a BitBucket refresh token flow...")
-
-        //get a new access token
-        self._refreshAccessToken(request: request) { error in
-
-            if let error = error {
-                Log.verbose("Failed to get a new access token")
-                completion(nil, nil, error)
-                return
-            }
-
-            //we have a new access token, force set the new cred on the original
-            //request
-            self.endpoints.setAuthOnRequest(request: request)
-
-            Log.verbose("Successfully refreshed a BitBucket access token")
-
-            //retrying the original request
-            self._sendRequest(request: request, isRetry: true, completion: completion)
-        }
-    }
-
-    private func _refreshAccessToken(request: NSMutableURLRequest, completion: @escaping (Error?) -> Void) {
-
-        let refreshRequest = self.endpoints.createRefreshTokenRequest()
-        _ = self.http.sendRequest(refreshRequest as URLRequest) { (response, body, error) -> Void in
-
-            if let error = error {
-                completion(error)
-                return
-            }
-
-            guard response?.statusCode == 200 else {
-                completion(GithubServerError.with("Wrong status code returned, refreshing access token failed"))
-                return
-            }
-
-            do {
-                let payload = body as! NSDictionary
-                let accessToken = try payload.stringForKey("access_token")
-                let refreshToken = try payload.stringForKey("refresh_token")
-                let secret = [refreshToken, accessToken].joined(separator: ":")
-
-                let newAuth = ProjectAuthenticator(service: self.service, username: "GIT", type: .OAuthToken, secret: secret)
-                self.endpoints.auth = newAuth
-                completion(nil)
-            } catch {
-                completion(error as NSError)
-            }
-        }
-    }
-
-    private func _sendRequestWithMethod(method: HTTP.Method, endpoint: BitBucketEndpoints.Endpoint, params: [String: String]?, query: [String: String]?, body: NSDictionary?, completion: @escaping HTTP.Completion) {
+    private func _sendRequestWithMethod(method: HTTP.Method, endpoint: BitBucketEnterpriseEndpoints.Endpoint, params: [String: String]?, query: [String: String]?, body: NSDictionary?, completion: @escaping HTTP.Completion) {
 
         var allParams = [
             "method": method.rawValue

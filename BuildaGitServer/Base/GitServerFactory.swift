@@ -15,7 +15,7 @@ class GitServerFactory {
 
         let server: SourceServerType & Notifier
 
-        switch service {
+        switch service.serviceType() {
         case .GitHub:
             let baseURL = "https://api.github.com"
             let endpoints = GitHubEndpoints(baseURL: baseURL, auth: auth)
@@ -24,6 +24,9 @@ class GitServerFactory {
             let baseURL = "https://api.bitbucket.org"
             let endpoints = BitBucketEndpoints(baseURL: baseURL, auth: auth)
             server = BitBucketServer(endpoints: endpoints, http: http)
+        case .BitBucketEnterprise:
+            let endpoints = BitBucketEnterpriseEndpoints(baseURL: "https://" + service.hostname(), auth: auth)
+            server = BitBucketEnterpriseServer(endpoints: endpoints, service: (service as? BitBucketEnterpriseService)!, http: http)
         }
 
         return server

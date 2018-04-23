@@ -17,7 +17,7 @@ class GitHubSourceTests: XCTestCase {
     override func setUp() {
         super.setUp()
 
-        self.github = GitServerFactory.server(service: .GitHub, auth: nil) as! GitHubServer
+        self.github = GitServerFactory.server(service: GitHubService(), auth: nil) as! GitHubServer
     }
 
     override func tearDown() {

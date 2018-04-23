@@ -69,16 +69,18 @@ class ServiceAuthenticator {
     }
 
     private func paramsForService(_ service: GitService) -> ([ParamKey: String], SecretFromResponseParams) {
-        switch service {
+        switch service.serviceType() {
         case .GitHub:
             return self.getGitHubParameters()
         case .BitBucket:
             return self.getBitBucketParameters()
+        default:
+            fatalError()
         }
     }
 
     private func getGitHubParameters() -> ([ParamKey: String], SecretFromResponseParams) {
-        let service = GitService.GitHub
+        let service = GitHubService()
         let params: [ParamKey: String] = [
             .ConsumerId: service.serviceKey(),
             .ConsumerSecret: service.serviceSecret(),
@@ -97,7 +99,7 @@ class ServiceAuthenticator {
     }
 
     private func getBitBucketParameters() -> ([ParamKey: String], SecretFromResponseParams) {
-        let service = GitService.BitBucket
+        let service = BitBucketService()
         let params: [ParamKey: String] = [
             .ConsumerId: service.serviceKey(),
             .ConsumerSecret: service.serviceSecret(),

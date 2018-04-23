@@ -144,7 +144,8 @@ class ProjectViewController: ConfigEditViewController {
             if self.tokenTextField.stringValue.isEmpty {
                 self.authenticator = nil
             } else {
-                self.authenticator = ProjectAuthenticator(service: .GitHub, username: "GIT", type: .PersonalToken, secret: self.tokenTextField.stringValue)
+                let service = self.project.workspaceMetadata!.service
+                self.authenticator = ProjectAuthenticator(service: service, username: "GIT", type: .PersonalToken, secret: self.tokenTextField.stringValue)
             }
         }
     }
@@ -161,7 +162,7 @@ class ProjectViewController: ConfigEditViewController {
         self.loginButton.isHidden = alreadyHasAuth
         self.logoutButton.isHidden = !alreadyHasAuth
 
-        let showTokenField = userWantsTokenAuth && proj.workspaceMetadata?.service == .GitHub && (auth?.type == .PersonalToken || auth == nil)
+        let showTokenField = userWantsTokenAuth && proj.workspaceMetadata?.service.serviceType() == .GitHub && (auth?.type == .PersonalToken || auth == nil)
         self.tokenStackView.isHidden = !showTokenField
 
         guard let service = proj.workspaceMetadata?.service else { return }
@@ -170,7 +171,7 @@ class ProjectViewController: ConfigEditViewController {
         self.serviceName.stringValue = name
         self.serviceLogo.image = NSImage(named: NSImage.Name(rawValue: service.logoName()))
 
-        switch service {
+        switch service.serviceType() {
         case .GitHub:
             if let auth = auth, auth.type == .PersonalToken && !auth.secret.isEmpty {
                 self.tokenTextField.stringValue = auth.secret
@@ -178,6 +179,8 @@ class ProjectViewController: ConfigEditViewController {
                 self.tokenTextField.stringValue = ""
             }
         case .BitBucket:
+            self.useTokenButton.isHidden = true
+        case .BitBucketEnterprise:
             self.useTokenButton.isHidden = true
         }
     }
@@ -292,17 +295,21 @@ class ProjectViewController: ConfigEditViewController {
             return
         }
 
-        self.serviceAuthenticator.getAccess(service) { (auth, _) -> Void in
+        if service.serviceType() == .BitBucketEnterprise {
 
-            guard let auth = auth else {
-                //TODO: show UI error that login failed
-                UIUtils.showAlertWithError(XcodeServerError.with("Failed to log in, please try again"))
-                self.authenticator = nil
-                return
+        } else {
+            self.serviceAuthenticator.getAccess(service) { (auth, _) -> Void in
+
+                guard let auth = auth else {
+                    //TODO: show UI error that login failed
+                    UIUtils.showAlertWithError(XcodeServerError.with("Failed to log in, please try again"))
+                    self.authenticator = nil
+                    return
+                }
+
+                //we have been authenticated, hooray!
+                self.authenticator = auth
             }
-
-            //we have been authenticated, hooray!
-            self.authenticator = auth
         }
     }
 

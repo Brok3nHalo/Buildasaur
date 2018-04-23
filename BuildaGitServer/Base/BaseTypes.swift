@@ -55,7 +55,7 @@ public class SourceServerFactory {
     public func createServer(service: GitService, auth: ProjectAuthenticator?) -> SourceServerType & Notifier {
 
         if let auth = auth {
-            precondition(service == auth.service)
+            precondition(service.serviceType() == auth.service.serviceType())
         }
 
         return GitServerFactory.server(service: service, auth: auth)

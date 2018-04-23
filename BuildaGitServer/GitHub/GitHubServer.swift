@@ -9,7 +9,7 @@
 import Foundation
 import BuildaUtils
 
-class GitHubServer: GitServer {
+class GitHubServer: GitServer<GitHubService> {
 
     let endpoints: GitHubEndpoints
     var latestRateLimitInfo: GitHubRateLimit?
@@ -19,7 +19,7 @@ class GitHubServer: GitServer {
     init(endpoints: GitHubEndpoints, http: HTTP? = nil) {
 
         self.endpoints = endpoints
-        super.init(service: .GitHub, http: http)
+        super.init(service: GitHubService(), http: http)
     }
 }
 

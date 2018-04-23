@@ -160,6 +160,9 @@ class GitHubEndpoints {
             switch auth.type {
             case .PersonalToken, .OAuthToken:
                 request.setValue("token \(auth.secret)", forHTTPHeaderField: "Authorization")
+            default:
+                // Unsupported Auth Type
+                assert(false)
             }
         }
 

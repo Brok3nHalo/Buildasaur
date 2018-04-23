@@ -80,12 +80,16 @@ extension WorkspaceMetadata {
         var checkoutType: CheckoutType?
         var gitService: GitService?
 
-        if projectURLString.contains(GitService.GitHub.hostname()) {
-            gitService = .GitHub
-        } else if projectURLString.contains(GitService.BitBucket.hostname()) {
-            gitService = .BitBucket
+        if projectURLString.contains(GitHubService().hostname()) {
+            gitService = GitHubService()
+        } else if projectURLString.contains(BitBucketService().hostname()) {
+            gitService = BitBucketService()
         } else {
-            Log.error("This git service is not yet supported.")
+            if url.scheme == "ssh" {
+                gitService = BitBucketEnterpriseService(baseURL: projectURLString)
+            } else {
+                Log.error("This git service is not yet supported.")
+            }
         }
 
         switch url.scheme ?? "" {
@@ -96,7 +100,7 @@ extension WorkspaceMetadata {
             }
         case "ssh":
             checkoutType = .SSH
-        case GitService.GitHub.hostname():
+        case GitHubService().hostname(), BitBucketService().hostname():
             checkoutType = .SSH
         default:
             Log.error("The \(String(describing: url.scheme)) scheme is not yet supported.")

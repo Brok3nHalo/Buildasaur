@@ -4,7 +4,10 @@ plugin 'cocoapods-keys', {
     "GitHubAPIClientId",
     "GitHubAPIClientSecret",
     "BitBucketAPIClientId",
-    "BitBucketAPIClientSecret"
+    "BitBucketAPIClientSecret",
+    "bitBucketEnterpriseUsername",
+    "bitBucketEnterprisePassword"
+
 ]}
 
 source 'https://github.com/CocoaPods/Specs.git'
