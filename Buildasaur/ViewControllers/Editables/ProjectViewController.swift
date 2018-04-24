@@ -39,6 +39,8 @@ class ProjectViewController: ConfigEditViewController {
             let pub = projectConfig.publicSSHKeyPath
             self.publicKeyUrl = pub.isEmpty ? nil : URL(fileURLWithPath: pub)
             self.sshPassphraseTextField.stringValue = projectConfig.sshPassphrase ?? ""
+            self.usernameTextFeild.stringValue = projectConfig.username ?? ""
+            self.passwordTextField.stringValue = projectConfig.password ?? ""
 
             self.updateServiceMeta()
         }
@@ -82,9 +84,22 @@ class ProjectViewController: ConfigEditViewController {
             self.updateNextAllowed()
         }
     }
+
     private var userWantsTokenAuth: Bool = false {
         didSet {
             self.updateServiceMeta()
+//            self.updateAuthenticator()
+        }
+    }
+
+    private var username: String = "" {
+        didSet {
+            self.updateAuthenticator()
+        }
+    }
+
+    private var password: String = "" {
+        didSet {
             self.updateAuthenticator()
         }
     }
@@ -94,6 +109,9 @@ class ProjectViewController: ConfigEditViewController {
     @IBOutlet weak var projectPathLabel: NSTextField!
     @IBOutlet weak var projectURLLabel: NSTextField!
 
+    @IBOutlet weak var publicSSHKeyStackView: NSStackView!
+    @IBOutlet weak var privateSSHKeyStackView: NSStackView!
+    @IBOutlet weak var sshKeyPassphraseStackView: NSStackView!
     @IBOutlet weak var selectSSHPrivateKeyButton: NSButton!
     @IBOutlet weak var selectSSHPublicKeyButton: NSButton!
     @IBOutlet weak var sshPassphraseTextField: NSSecureTextField!
@@ -101,6 +119,12 @@ class ProjectViewController: ConfigEditViewController {
     //authentication stuff
     @IBOutlet weak var tokenTextField: NSTextField!
     @IBOutlet weak var tokenStackView: NSStackView!
+    @IBOutlet weak var usernameTextFeild: NSTextField!
+    @IBOutlet weak var usernameStackView: NSStackView!
+    @IBOutlet weak var passwordTextField: NSSecureTextField!
+    @IBOutlet weak var passwordStackView: NSStackView!
+
+
     @IBOutlet weak var serviceName: NSTextField!
     @IBOutlet weak var serviceLogo: NSImageView!
     @IBOutlet weak var loginButton: NSButton!
@@ -113,6 +137,8 @@ class ProjectViewController: ConfigEditViewController {
             self.selectSSHPublicKeyButton.isEnabled = self.editing
             self.sshPassphraseTextField.isEnabled = self.editing
             self.tokenTextField.isEnabled = self.editing
+            self.usernameTextFeild.isEnabled = self.editing
+            self.passwordTextField.isEnabled = self.editing
             self.trashButton.isHidden = self.editing
         }
     }
@@ -131,6 +157,8 @@ class ProjectViewController: ConfigEditViewController {
     func setupUI() {
         self.tokenTextField.delegate = self
         self.sshPassphraseTextField.delegate = self
+        self.usernameTextFeild.delegate = self
+        self.passwordTextField.delegate = self
     }
 
     private func updateServiceMeta() {
@@ -140,11 +168,21 @@ class ProjectViewController: ConfigEditViewController {
     }
 
     private func updateAuthenticator() {
-        if self.userWantsTokenAuth {
+        let service = self.project.workspaceMetadata!.service
+        if service.serviceType() == .BitBucketEnterprise {
+            if username.isEmpty || password.isEmpty {
+                self.authenticator = nil
+            } else {
+                self.authenticator = ProjectAuthenticator(
+                    service: service,
+                    username: username,
+                    type: .Basic,
+                    secret: password)
+            }
+        } else if self.userWantsTokenAuth {
             if self.tokenTextField.stringValue.isEmpty {
                 self.authenticator = nil
             } else {
-                let service = self.project.workspaceMetadata!.service
                 self.authenticator = ProjectAuthenticator(service: service, username: "GIT", type: .PersonalToken, secret: self.tokenTextField.stringValue)
             }
         }
@@ -157,15 +195,15 @@ class ProjectViewController: ConfigEditViewController {
     }
 
     func updateServiceMeta(_ proj: Project, auth: ProjectAuthenticator?, userWantsTokenAuth: Bool) {
+        guard let service = proj.workspaceMetadata?.service else { return }
         let alreadyHasAuth = auth != nil
 
         self.loginButton.isHidden = alreadyHasAuth
-        self.logoutButton.isHidden = !alreadyHasAuth
+        self.logoutButton.isHidden = !alreadyHasAuth || service.serviceType() == .BitBucketEnterprise
 
         let showTokenField = userWantsTokenAuth && proj.workspaceMetadata?.service.serviceType() == .GitHub && (auth?.type == .PersonalToken || auth == nil)
         self.tokenStackView.isHidden = !showTokenField
 
-        guard let service = proj.workspaceMetadata?.service else { return }
 
         let name = "\(service.prettyName())"
         self.serviceName.stringValue = name
@@ -178,10 +216,19 @@ class ProjectViewController: ConfigEditViewController {
             } else {
                 self.tokenTextField.stringValue = ""
             }
+
+            self.usernameStackView.isHidden = true
+            self.passwordStackView.isHidden = true
         case .BitBucket:
             self.useTokenButton.isHidden = true
+            self.usernameStackView.isHidden = true
+            self.passwordStackView.isHidden = true
         case .BitBucketEnterprise:
+//            self.publicSSHKeyStackView.isHidden = true
+//            self.privateSSHKeyStackView.isHidden = true
+//            self.sshKeyPassphraseStackView.isHidden = true
             self.useTokenButton.isHidden = true
+            self.loginButton.isHidden = true
         }
     }
 
@@ -333,9 +380,12 @@ extension ProjectViewController: NSTextFieldDelegate {
                 || textField == self.sshPassphraseTextField {
                 self.availabilityCheckState = .unchecked
                 self.updateNextAllowed()
-            }
-            if textField == self.tokenTextField {
+            } else if textField == self.tokenTextField {
                 self.updateAuthenticator()
+            } else if textField == self.usernameTextFeild {
+                self.username = textField.stringValue
+            } else if textField == self.passwordTextField {
+                self.password = textField.stringValue
             }
         }
     }

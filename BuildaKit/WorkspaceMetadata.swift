@@ -49,7 +49,7 @@ public struct WorkspaceMetadata {
 
         //we have to prefix SSH urls with "git@" (for a reason I don't remember anymore, probs because the user "git" is treated as a standard part of the url itself)
         var correctedProjectUrlString = projectURLString
-        if case .SSH = checkoutType, !projectURLString.hasPrefix("git@") {
+        if case .SSH = checkoutType, !projectURLString.hasPrefix("git@"), service.serviceType() != .BitBucketEnterprise {
             correctedProjectUrlString = "git@" + projectURLString
         }
 

@@ -15,6 +15,8 @@ public struct ProjectConfig {
     public var url: String
     public var privateSSHKeyPath: String
     public var publicSSHKeyPath: String
+    public var username: String?
+    public var password: String?
 
     public var sshPassphrase: String? //loaded from the keychain
     public var serverAuthentication: ProjectAuthenticator? //loaded from the keychain
@@ -27,6 +29,8 @@ public struct ProjectConfig {
         self.privateSSHKeyPath = ""
         self.publicSSHKeyPath = ""
         self.sshPassphrase = nil
+        self.username = nil
+        self.password = nil
     }
 
     public func validate() throws {

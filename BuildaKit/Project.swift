@@ -61,28 +61,34 @@ open class Project {
 
     public func serviceRepoName() -> String? {
         guard let meta = self.workspaceMetadata else { return nil }
-
         let projectUrl = meta.projectURL
+
         let service = meta.service
 
-        let originalStringUrl = projectUrl.absoluteString
-        let stringUrl = originalStringUrl!.lowercased()
+        switch service.serviceType() {
+        case .BitBucketEnterprise:
+            return meta.projectURL.path
+        default:
+            let originalStringUrl = projectUrl.absoluteString
+            let stringUrl = originalStringUrl!.lowercased()
 
-        /*
-        both https and ssh repos on github have a form of:
-        {https://|git@}SERVICE_URL{:|/}organization/repo.git
-        here I need the organization/repo bit, which I'll do by finding "SERVICE_URL" and shifting right by one
-        and scan up until ".git"
-        */
+            /*
+             both https and ssh repos on github have a form of:
+             {https://|git@}SERVICE_URL{:|/}organization/repo.git
+             here I need the organization/repo bit, which I'll do by finding "SERVICE_URL" and shifting right by one
+             and scan up until ".git"
+             */
 
-        let serviceUrl = service.hostname().lowercased()
-        let dotGitRange = stringUrl.range(of: ".git", options: NSString.CompareOptions.backwards, range: nil, locale: nil) ?? stringUrl.endIndex..<stringUrl.endIndex
-        if let githubRange = stringUrl.range(of: serviceUrl, options: [], range: nil, locale: nil) {
-            let start = stringUrl.index(githubRange.upperBound, offsetBy: 1)
-            let end = dotGitRange.lowerBound
+            let serviceUrl = service.hostname().lowercased()
+            let dotGitRange = stringUrl.range(of: ".git", options: NSString.CompareOptions.backwards, range: nil, locale: nil) ?? stringUrl.endIndex..<stringUrl.endIndex
+            if let githubRange = stringUrl.range(of: serviceUrl, options: [], range: nil, locale: nil) {
+                let start = stringUrl.index(githubRange.upperBound, offsetBy: 1)
+                let end = dotGitRange.lowerBound
 
-            let repoName = originalStringUrl![start ..< end]
+                let repoName = originalStringUrl![start ..< end]
                 return String(repoName)
+            }
+
         }
         return nil
     }
